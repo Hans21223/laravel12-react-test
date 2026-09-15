@@ -186,5 +186,8 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Maintenance/Settings/Index');
     })->name('maintenance.settings');
 
-    
+
+    Route::get('/maintenance/profile', function () {
+        return Inertia::render('Maintenance/Profile');
+    })->name('maintenance.profile');
 });

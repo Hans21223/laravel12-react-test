@@ -1,107 +1,86 @@
-import React, { useEffect, useState } from 'react';
-import {
-    Link,
-    router,
-    usePage,
-} from '@inertiajs/react';
+import React, { useEffect, useState } from "react";
+import { Link, router, usePage } from "@inertiajs/react";
 
 export default function MaintenanceLayout({
     children,
-    title = 'Maintenance System',
+    title = "Maintenance System",
 }) {
     const { url, props } = usePage();
     const user = props.auth?.user;
 
-    const [mobileMenuOpen, setMobileMenuOpen] =
-        useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    const [userMenuOpen, setUserMenuOpen] =
-        useState(false);
+    const [userMenuOpen, setUserMenuOpen] = useState(false);
 
     const [theme, setTheme] = useState(
-        localStorage.getItem('fixflow-theme') ||
-            'light'
+        localStorage.getItem("fixflow-theme") || "light",
     );
 
     const [language, setLanguage] = useState(
-        localStorage.getItem('fixflow-language') ||
-            'th'
+        localStorage.getItem("fixflow-language") || "th",
     );
 
-    const isThai = language === 'th';
-
+    const isThai = language === "th";
 
     const translations = {
         th: {
-            dashboard: 'Dashboard',
-            newRequest: 'แจ้งซ่อม',
-            requests: 'รายการแจ้งซ่อม',
-            technicians: 'ช่างซ่อม',
-            invoices: 'ใบแจ้งหนี้',
-            settings: 'ตั้งค่า',
-            menu: 'เมนู',
-            subtitle:
-                'ระบบบริหารจัดการงานซ่อมบำรุง',
-            account: 'บัญชีผู้ใช้',
-            logout: 'ออกจากระบบ',
-            oldSystem: 'กลับระบบเดิม',
+            dashboard: "Dashboard",
+            newRequest: "แจ้งซ่อม",
+            requests: "รายการแจ้งซ่อม",
+            technicians: "ช่างซ่อม",
+            invoices: "ใบแจ้งหนี้",
+            profile: "โปรไฟล์ของฉัน",
+            settings: "ตั้งค่า",
+            menu: "เมนู",
+            subtitle: "ระบบบริหารจัดการงานซ่อมบำรุง",
+            account: "บัญชีผู้ใช้",
+            logout: "ออกจากระบบ",
+            oldSystem: "กลับระบบเดิม",
         },
 
         en: {
-            dashboard: 'Dashboard',
-            newRequest: 'New Request',
-            requests: 'Repair Requests',
-            technicians: 'Technicians',
-            invoices: 'Invoices',
-            settings: 'Settings',
-            menu: 'Menu',
-            subtitle:
-                'Maintenance Management System',
-            account: 'Account',
-            logout: 'Log out',
-            oldSystem: 'Back to old system',
+            dashboard: "Dashboard",
+            newRequest: "New Request",
+            requests: "Repair Requests",
+            technicians: "Technicians",
+            invoices: "Invoices",
+            profile: "My Profile",
+            settings: "Settings",
+            menu: "Menu",
+            subtitle: "Maintenance Management System",
+            account: "Account",
+            logout: "Logout",
+            oldSystem: "Back to Old System",
         },
     };
 
     const t = translations[language];
 
-
     const applyTheme = (value) => {
         let darkMode = false;
 
-        if (value === 'dark') {
+        if (value === "dark") {
             darkMode = true;
         }
 
-        if (value === 'system') {
+        if (value === "system") {
             darkMode = window.matchMedia(
-                '(prefers-color-scheme: dark)'
+                "(prefers-color-scheme: dark)",
             ).matches;
         }
 
-        document.documentElement.classList.toggle(
-            'fixflow-dark',
-            darkMode
-        );
+        document.documentElement.classList.toggle("fixflow-dark", darkMode);
 
         setTheme(value);
     };
 
-
     useEffect(() => {
-        const savedTheme =
-            localStorage.getItem(
-                'fixflow-theme'
-            ) || 'light';
+        const savedTheme = localStorage.getItem("fixflow-theme") || "light";
 
-        const savedLanguage =
-            localStorage.getItem(
-                'fixflow-language'
-            ) || 'th';
+        const savedLanguage = localStorage.getItem("fixflow-language") || "th";
 
         setLanguage(savedLanguage);
         applyTheme(savedTheme);
-
 
         const handleTheme = (event) => {
             applyTheme(event.detail);
@@ -111,172 +90,129 @@ export default function MaintenanceLayout({
             setLanguage(event.detail);
         };
 
-        window.addEventListener(
-            'fixflow-theme-change',
-            handleTheme
-        );
+        window.addEventListener("fixflow-theme-change", handleTheme);
 
-        window.addEventListener(
-            'fixflow-language-change',
-            handleLanguage
-        );
+        window.addEventListener("fixflow-language-change", handleLanguage);
 
-
-        const media = window.matchMedia(
-            '(prefers-color-scheme: dark)'
-        );
+        const media = window.matchMedia("(prefers-color-scheme: dark)");
 
         const systemThemeChanged = () => {
-            const current =
-                localStorage.getItem(
-                    'fixflow-theme'
-                );
+            const current = localStorage.getItem("fixflow-theme");
 
-            if (current === 'system') {
-                applyTheme('system');
+            if (current === "system") {
+                applyTheme("system");
             }
         };
 
-        media.addEventListener(
-            'change',
-            systemThemeChanged
-        );
-
+        media.addEventListener("change", systemThemeChanged);
 
         return () => {
-            window.removeEventListener(
-                'fixflow-theme-change',
-                handleTheme
-            );
+            window.removeEventListener("fixflow-theme-change", handleTheme);
 
             window.removeEventListener(
-                'fixflow-language-change',
-                handleLanguage
+                "fixflow-language-change",
+                handleLanguage,
             );
 
-            media.removeEventListener(
-                'change',
-                systemThemeChanged
-            );
+            media.removeEventListener("change", systemThemeChanged);
         };
     }, []);
 
+    const role = user?.role ?? "guest";
 
-    const role = user?.role ?? 'guest';
+    const menuItems = [
+        // ทุก Role เห็น Dashboard
+        {
+            name: t.dashboard,
+            href: "/maintenance",
+            icon: "bi-grid",
+        },
 
-const menuItems = [
-    // ทุก Role เห็น Dashboard
-    {
-        name: t.dashboard,
-        href: '/maintenance',
-        icon: 'bi-grid',
-    },
+        {
+            name: t.profile,
+            href: "/maintenance/profile",
+            icon: "bi-person-circle",
+        },
 
-    // User และ Admin แจ้งซ่อมใหม่ได้
-    ...(['guest', 'admin'].includes(role)
-        ? [
-              {
-                  name: t.newRequest,
-                  href: '/maintenance/requests/create',
-                  icon: 'bi-plus-circle',
-              },
-          ]
-        : []),
+        // User และ Admin แจ้งซ่อมใหม่ได้
+        ...(["guest", "admin"].includes(role)
+            ? [
+                  {
+                      name: t.newRequest,
+                      href: "/maintenance/requests/create",
+                      icon: "bi-plus-circle",
+                  },
+              ]
+            : []),
 
-    // ทุก Role มีหน้ารายการงาน
-    {
-        name: t.requests,
-        href: '/maintenance/requests',
-        icon: 'bi-tools',
-    },
+        // ทุก Role มีหน้ารายการงาน
+        {
+            name: t.requests,
+            href: "/maintenance/requests",
+            icon: "bi-tools",
+        },
 
-    // เฉพาะ Admin จัดการผู้ใช้/ช่าง
-    ...(role === 'admin'
-        ? [
-              {
-                  name: t.technicians,
-                  href: '/maintenance/technicians',
-                  icon: 'bi-person-gear',
-              },
-          ]
-        : []),
+        // เฉพาะ Admin จัดการผู้ใช้/ช่าง
+        ...(role === "admin"
+            ? [
+                  {
+                      name: t.technicians,
+                      href: "/maintenance/technicians",
+                      icon: "bi-person-gear",
+                  },
+              ]
+            : []),
 
-    // เฉพาะ Admin ดูใบแจ้งหนี้
-    ...(role === 'admin'
-        ? [
-              {
-                  name: t.invoices,
-                  href: '/maintenance/invoices',
-                  icon: 'bi-receipt',
-              },
-          ]
-        : []),
-];
+        // เฉพาะ Admin ดูใบแจ้งหนี้
+        ...(role === "admin"
+            ? [
+                  {
+                      name: t.invoices,
+                      href: "/maintenance/invoices",
+                      icon: "bi-receipt",
+                  },
+              ]
+            : []),
+    ];
 
     const isActive = (href) => {
-        if (href === '/maintenance') {
-            return url === '/maintenance';
+        if (href === "/maintenance") {
+            return url === "/maintenance";
         }
 
-        if (
-            href ===
-            '/maintenance/requests/create'
-        ) {
+        if (href === "/maintenance/requests/create") {
+            return url === "/maintenance/requests/create";
+        }
+
+        if (href === "/maintenance/requests") {
             return (
-                url ===
-                '/maintenance/requests/create'
+                url === "/maintenance/requests" ||
+                (url.startsWith("/maintenance/requests/") &&
+                    url !== "/maintenance/requests/create")
             );
         }
 
-        if (
-            href === '/maintenance/requests'
-        ) {
-            return (
-                url ===
-                    '/maintenance/requests' ||
-                (url.startsWith(
-                    '/maintenance/requests/'
-                ) &&
-                    url !==
-                        '/maintenance/requests/create')
-            );
+        if (href === "/maintenance/technicians") {
+            return url.startsWith("/maintenance/technicians");
         }
 
-        if (
-            href ===
-            '/maintenance/technicians'
-        ) {
-            return url.startsWith(
-                '/maintenance/technicians'
-            );
-        }
-
-        if (
-            href ===
-            '/maintenance/invoices'
-        ) {
-            return url.startsWith(
-                '/maintenance/invoices'
-            );
+        if (href === "/maintenance/invoices") {
+            return url.startsWith("/maintenance/invoices");
         }
 
         return url === href;
     };
 
-
     const logout = () => {
-        router.post('/logout');
+        router.post("/logout");
     };
-
 
     return (
         <div className="fixflow-app min-h-screen bg-slate-50">
-
             <link
                 href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
                 rel="stylesheet"
             />
-
 
             {/* DARK MODE OVERRIDES */}
             <style>{`
@@ -521,17 +457,13 @@ const menuItems = [
     }
 `}</style>
 
-
             {/* MOBILE OVERLAY */}
             {mobileMenuOpen && (
                 <div
                     className="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-sm lg:hidden"
-                    onClick={() =>
-                        setMobileMenuOpen(false)
-                    }
+                    onClick={() => setMobileMenuOpen(false)}
                 />
             )}
-
 
             {/* SIDEBAR */}
             <aside
@@ -544,60 +476,39 @@ const menuItems = [
                     shadow-2xl
                     transition-transform duration-300
                     lg:translate-x-0
-                    ${
-                        mobileMenuOpen
-                            ? 'translate-x-0'
-                            : '-translate-x-full'
-                    }
+                    ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
                 `}
             >
-
                 {/* BRAND */}
                 <div className="mb-8 rounded-2xl border border-white/10 bg-white/[0.06] p-4">
-
                     <div className="flex items-center gap-4">
-
                         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-600 shadow-lg shadow-blue-950/30">
                             <i className="bi bi-tools text-xl"></i>
                         </div>
 
                         <div>
-
-                            <div className="text-xl font-bold">
-                                FixFlow
-                            </div>
+                            <div className="text-xl font-bold">FixFlow</div>
 
                             <div className="text-sm text-slate-400">
                                 Maintenance System
                             </div>
-
                         </div>
-
                     </div>
-
                 </div>
-
 
                 <div className="mb-3 px-3 text-xs font-bold uppercase tracking-[0.15em] text-slate-500">
                     {t.menu}
                 </div>
 
-
                 <nav className="space-y-1">
-
                     {menuItems.map((item) => {
-                        const active =
-                            isActive(item.href);
+                        const active = isActive(item.href);
 
                         return (
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                onClick={() =>
-                                    setMobileMenuOpen(
-                                        false
-                                    )
-                                }
+                                onClick={() => setMobileMenuOpen(false)}
                                 className={`
                                     group flex items-center gap-3
                                     rounded-xl px-4 py-3
@@ -606,46 +517,37 @@ const menuItems = [
                                     transition-all
                                     ${
                                         active
-                                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30'
-                                            : 'text-slate-300 hover:bg-white/[0.07] hover:text-white'
+                                            ? "bg-blue-600 text-white shadow-lg shadow-blue-950/30"
+                                            : "text-slate-300 hover:bg-white/[0.07] hover:text-white"
                                     }
                                 `}
                             >
-
                                 <div
                                     className={`
                                         flex h-8 w-8 items-center justify-center
                                         rounded-lg
                                         ${
                                             active
-                                                ? 'bg-white/15'
-                                                : 'bg-white/[0.04]'
+                                                ? "bg-white/15"
+                                                : "bg-white/[0.04]"
                                         }
                                     `}
                                 >
-                                    <i
-                                        className={`bi ${item.icon}`}
-                                    ></i>
+                                    <i className={`bi ${item.icon}`}></i>
                                 </div>
 
-                                <span>
-                                    {item.name}
-                                </span>
+                                <span>{item.name}</span>
 
                                 {active && (
                                     <i className="bi bi-chevron-right ml-auto text-xs opacity-70"></i>
                                 )}
-
                             </Link>
                         );
                     })}
-
                 </nav>
-
 
                 {/* SETTINGS */}
                 <div className="mt-auto space-y-1 border-t border-white/10 pt-5">
-
                     <Link
                         href="/maintenance/settings"
                         className={`
@@ -655,21 +557,16 @@ const menuItems = [
                             no-underline
                             transition
                             ${
-                                url.startsWith(
-                                    '/maintenance/settings'
-                                )
-                                    ? 'bg-blue-600 text-white'
-                                    : 'text-slate-400 hover:bg-white/[0.07] hover:text-white'
+                                url.startsWith("/maintenance/settings")
+                                    ? "bg-blue-600 text-white"
+                                    : "text-slate-400 hover:bg-white/[0.07] hover:text-white"
                             }
                         `}
                     >
                         <i className="bi bi-gear"></i>
 
-                        <span>
-                            {t.settings}
-                        </span>
+                        <span>{t.settings}</span>
                     </Link>
-
 
                     <Link
                         href="/dashboard"
@@ -687,41 +584,26 @@ const menuItems = [
                     >
                         <i className="bi bi-arrow-left"></i>
 
-                        <span>
-                            {t.oldSystem}
-                        </span>
+                        <span>{t.oldSystem}</span>
                     </Link>
-
                 </div>
-
             </aside>
-
 
             {/* PAGE */}
             <div className="min-h-screen lg:pl-[280px]">
-
                 {/* TOPBAR */}
                 <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white">
-
                     <div className="flex min-h-[76px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-
                         <div className="flex min-w-0 items-center gap-3">
-
                             <button
                                 type="button"
-                                onClick={() =>
-                                    setMobileMenuOpen(
-                                        true
-                                    )
-                                }
+                                onClick={() => setMobileMenuOpen(true)}
                                 className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm lg:hidden"
                             >
                                 <i className="bi bi-list text-xl"></i>
                             </button>
 
-
                             <div>
-
                                 <h1 className="truncate text-lg font-bold text-slate-900 sm:text-xl">
                                     {title}
                                 </h1>
@@ -729,56 +611,38 @@ const menuItems = [
                                 <p className="hidden text-sm text-slate-500 sm:block">
                                     {t.subtitle}
                                 </p>
-
                             </div>
-
                         </div>
-
 
                         {/* USER MENU */}
                         <div className="relative">
-
                             <button
                                 type="button"
-                                onClick={() =>
-                                    setUserMenuOpen(
-                                        !userMenuOpen
-                                    )
-                                }
+                                onClick={() => setUserMenuOpen(!userMenuOpen)}
                                 className="flex items-center gap-3 rounded-xl px-2 py-2 transition hover:bg-slate-100"
                             >
-
                                 <div className="hidden text-right sm:block">
-
                                     <div className="max-w-[220px] truncate text-sm font-semibold text-slate-900">
-                                        {user?.name ??
-                                            'User'}
+                                        {user?.name ?? "User"}
                                     </div>
 
                                     <div className="text-xs capitalize text-slate-500">
-                                        {user?.role ??
-                                            'guest'}
+                                        {user?.role ?? "guest"}
                                     </div>
-
                                 </div>
 
-
                                 <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-700">
-                                    {(user?.name ?? 'U')
+                                    {(user?.name ?? "U")
                                         .charAt(0)
                                         .toUpperCase()}
                                 </div>
 
                                 <i className="bi bi-chevron-down text-xs text-slate-400"></i>
-
                             </button>
-
 
                             {userMenuOpen && (
                                 <div className="absolute right-0 mt-2 w-64 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
-
                                     <div className="border-b border-slate-100 p-4">
-
                                         <div className="font-semibold text-slate-900">
                                             {user?.name}
                                         </div>
@@ -786,18 +650,13 @@ const menuItems = [
                                         <div className="mt-1 truncate text-xs text-slate-500">
                                             {user?.email}
                                         </div>
-
                                     </div>
 
-
                                     <div className="p-2">
-
                                         <Link
                                             href="/maintenance/settings"
                                             onClick={() =>
-                                                setUserMenuOpen(
-                                                    false
-                                                )
+                                                setUserMenuOpen(false)
                                             }
                                             className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-700 no-underline hover:bg-slate-100"
                                         >
@@ -805,7 +664,6 @@ const menuItems = [
 
                                             {t.settings}
                                         </Link>
-
 
                                         <button
                                             type="button"
@@ -816,29 +674,19 @@ const menuItems = [
 
                                             {t.logout}
                                         </button>
-
                                     </div>
-
                                 </div>
                             )}
-
                         </div>
-
                     </div>
-
                 </header>
 
-
                 <main className="p-4 sm:p-6 lg:p-8">
-
                     <div className="mx-auto w-full max-w-[1600px]">
                         {children}
                     </div>
-
                 </main>
-
             </div>
-
         </div>
     );
 }
