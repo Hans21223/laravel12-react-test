@@ -1,12 +1,21 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import React from 'react';
+import {
+    Head,
+    Link,
+    useForm,
+} from '@inertiajs/react';
+
+import FixFlowAuthLayout from '@/Layouts/FixFlowAuthLayout';
 
 export default function Register() {
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const {
+        data,
+        setData,
+        post,
+        processing,
+        errors,
+        reset,
+    } = useForm({
         name: '',
         email: '',
         password: '',
@@ -17,104 +26,260 @@ export default function Register() {
         e.preventDefault();
 
         post(route('register'), {
-            onFinish: () => reset('password', 'password_confirmation'),
+            onFinish: () =>
+                reset(
+                    'password',
+                    'password_confirmation'
+                ),
         });
     };
 
     return (
-        <GuestLayout>
-            <Head title="Register" />
+        <FixFlowAuthLayout
+            title="สร้างบัญชีใหม่"
+            subtitle="สมัครสมาชิกเพื่อเริ่มแจ้งและติดตามงานซ่อมผ่าน FixFlow"
+        >
+            <Head title="สมัครสมาชิก" />
 
-            <form onSubmit={submit}>
+
+            <form
+                onSubmit={submit}
+                className="space-y-5"
+            >
+
+                {/* NAME */}
                 <div>
-                    <InputLabel htmlFor="name" value="Name" />
 
-                    <TextInput
-                        id="name"
-                        name="name"
+                    <label className="mb-2 block text-sm font-semibold text-slate-700">
+                        ชื่อ - นามสกุล
+                    </label>
+
+                    <input
+                        type="text"
                         value={data.name}
-                        className="mt-1 block w-full"
+                        autoFocus
                         autoComplete="name"
-                        isFocused={true}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
+                        onChange={(e) =>
+                            setData(
+                                'name',
+                                e.target.value
+                            )
+                        }
+                        placeholder="กรอกชื่อและนามสกุล"
+                        className={`
+                            w-full
+                            rounded-xl
+                            border
+                            bg-white
+                            px-4 py-3.5
+                            text-sm
+                            text-slate-900
+                            outline-none
+                            transition
+                            placeholder:text-slate-400
+                            focus:ring-4
+                            ${
+                                errors.name
+                                    ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10'
+                                    : 'border-slate-200 focus:border-blue-500 focus:ring-blue-500/10'
+                            }
+                        `}
                     />
 
-                    <InputError message={errors.name} className="mt-2" />
+                    {errors.name && (
+                        <p className="mt-2 text-sm text-rose-600">
+                            {errors.name}
+                        </p>
+                    )}
+
                 </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="email" value="Email" />
 
-                    <TextInput
-                        id="email"
+                {/* EMAIL */}
+                <div>
+
+                    <label className="mb-2 block text-sm font-semibold text-slate-700">
+                        อีเมล
+                    </label>
+
+                    <input
                         type="email"
-                        name="email"
                         value={data.email}
-                        className="mt-1 block w-full"
                         autoComplete="username"
-                        onChange={(e) => setData('email', e.target.value)}
-                        required
+                        onChange={(e) =>
+                            setData(
+                                'email',
+                                e.target.value
+                            )
+                        }
+                        placeholder="name@example.com"
+                        className={`
+                            w-full
+                            rounded-xl
+                            border
+                            bg-white
+                            px-4 py-3.5
+                            text-sm
+                            text-slate-900
+                            outline-none
+                            transition
+                            placeholder:text-slate-400
+                            focus:ring-4
+                            ${
+                                errors.email
+                                    ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10'
+                                    : 'border-slate-200 focus:border-blue-500 focus:ring-blue-500/10'
+                            }
+                        `}
                     />
 
-                    <InputError message={errors.email} className="mt-2" />
+                    {errors.email && (
+                        <p className="mt-2 text-sm text-rose-600">
+                            {errors.email}
+                        </p>
+                    )}
+
                 </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
 
-                    <TextInput
-                        id="password"
+                {/* PASSWORD */}
+                <div>
+
+                    <label className="mb-2 block text-sm font-semibold text-slate-700">
+                        รหัสผ่าน
+                    </label>
+
+                    <input
                         type="password"
-                        name="password"
                         value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                        required
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel
-                        htmlFor="password_confirmation"
-                        value="Confirm Password"
-                    />
-
-                    <TextInput
-                        id="password_confirmation"
-                        type="password"
-                        name="password_confirmation"
-                        value={data.password_confirmation}
-                        className="mt-1 block w-full"
                         autoComplete="new-password"
                         onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
+                            setData(
+                                'password',
+                                e.target.value
+                            )
                         }
-                        required
+                        placeholder="อย่างน้อย 8 ตัวอักษร"
+                        className={`
+                            w-full
+                            rounded-xl
+                            border
+                            bg-white
+                            px-4 py-3.5
+                            text-sm
+                            text-slate-900
+                            outline-none
+                            transition
+                            placeholder:text-slate-400
+                            focus:ring-4
+                            ${
+                                errors.password
+                                    ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/10'
+                                    : 'border-slate-200 focus:border-blue-500 focus:ring-blue-500/10'
+                            }
+                        `}
                     />
 
-                    <InputError
-                        message={errors.password_confirmation}
-                        className="mt-2"
+                    {errors.password && (
+                        <p className="mt-2 text-sm text-rose-600">
+                            {errors.password}
+                        </p>
+                    )}
+
+                </div>
+
+
+                {/* CONFIRM PASSWORD */}
+                <div>
+
+                    <label className="mb-2 block text-sm font-semibold text-slate-700">
+                        ยืนยันรหัสผ่าน
+                    </label>
+
+                    <input
+                        type="password"
+                        value={
+                            data.password_confirmation
+                        }
+                        autoComplete="new-password"
+                        onChange={(e) =>
+                            setData(
+                                'password_confirmation',
+                                e.target.value
+                            )
+                        }
+                        placeholder="กรอกรหัสผ่านอีกครั้ง"
+                        className="
+                            w-full
+                            rounded-xl
+                            border border-slate-200
+                            bg-white
+                            px-4 py-3.5
+                            text-sm
+                            text-slate-900
+                            outline-none
+                            transition
+                            placeholder:text-slate-400
+                            focus:border-blue-500
+                            focus:ring-4
+                            focus:ring-blue-500/10
+                        "
                     />
+
+                    {errors.password_confirmation && (
+                        <p className="mt-2 text-sm text-rose-600">
+                            {
+                                errors.password_confirmation
+                            }
+                        </p>
+                    )}
+
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
-                    <Link
-                        href={route('login')}
-                        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                        Already registered?
-                    </Link>
 
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Register
-                    </PrimaryButton>
-                </div>
+                <button
+                    type="submit"
+                    disabled={processing}
+                    className="
+                        flex w-full
+                        items-center
+                        justify-center
+                        gap-2
+                        rounded-xl
+                        bg-blue-600
+                        px-5 py-3.5
+                        text-sm
+                        font-semibold
+                        text-white
+                        shadow-lg
+                        shadow-blue-600/20
+                        transition
+                        hover:bg-blue-700
+                        disabled:cursor-not-allowed
+                        disabled:opacity-60
+                    "
+                >
+                    {processing
+                        ? 'กำลังสร้างบัญชี...'
+                        : 'สมัครสมาชิก'}
+                </button>
+
             </form>
-        </GuestLayout>
+
+
+            <div className="mt-7 text-center text-sm text-slate-600">
+
+                มีบัญชีอยู่แล้ว?
+
+                <Link
+                    href={route('login')}
+                    className="ml-2 font-bold text-blue-600 no-underline hover:text-blue-800"
+                >
+                    เข้าสู่ระบบ
+                </Link>
+
+            </div>
+
+        </FixFlowAuthLayout>
     );
 }

@@ -26,7 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 Route::get('/test', function () {
     return Inertia::render('Test');
@@ -45,6 +45,17 @@ Route::get('/fruit', function () {
 Route::get('/hello-teacher', function () {
     return Inertia::render('HelloTeacher');
 })->name('hello-teacher');
+
+Route::get('/teacher', function () {
+    return Inertia::render('HelloTeacher');
+})->middleware('auth');
+
+Route::middleware(['auth', 'role:admin,teacher,guest'])->group(function () {
+    Route::get('/teacher', function () {
+        return Inertia::render('teacher');
+    });
+});
+
 
 Route::get('/about-page', function () {
     return Inertia::render('AboutPage');
@@ -91,9 +102,10 @@ Route::get('/quiz3', function () {
 
 // routes/web.php
 use App\Models\Product;
+
 Route::get('/product', function () {
     $products = Product::all();
-    return Inertia::render('ProductList', compact('products') );
+    return Inertia::render('ProductList', compact('products'));
 })->name('product');
 
 // routes/web.php
@@ -103,7 +115,7 @@ Route::get('/product-others', function () {
 
 // Route Web ตามที่โจทย์กำหนด
 Route::get('/quiz4', function () {
-    return Inertia::render('Quiz4'); 
+    return Inertia::render('Quiz4');
 })->name('quiz4');
 
 Route::get('/product-manager', function () {
@@ -123,3 +135,56 @@ Route::get('/product/{id}/edit', function ($id) {
 
 // สร้าง Route ครบทุก Action (index, create, store, edit, update, destroy)
 Route::resource('weights', WeightController::class);
+
+
+
+// ==========================================
+// Maintenance Request System
+// ==========================================
+
+Route::middleware('auth')->group(function () {
+
+    Route::get('/maintenance', function () {
+        return Inertia::render('Maintenance/Dashboard');
+    })->name('maintenance.dashboard');
+
+    Route::get('/maintenance/requests', function () {
+        return Inertia::render('Maintenance/Requests/Index');
+    })->name('maintenance.requests.index');
+
+    Route::get('/maintenance/requests/create', function () {
+        return Inertia::render('Maintenance/Requests/Create');
+    })->name('maintenance.requests.create');
+
+    Route::get('/maintenance/requests/{id}', function ($id) {
+        return Inertia::render('Maintenance/Requests/Show', [
+            'requestId' => $id,
+        ]);
+    })->name('maintenance.requests.show');
+
+    Route::get('/maintenance/technicians', function () {
+        return Inertia::render('Maintenance/Technicians/Index');
+    })->name('maintenance.technicians.index');
+
+    Route::get('/maintenance/invoices', function () {
+        return Inertia::render('Maintenance/Invoices/Index');
+    })->name('maintenance.invoices.index');
+
+    Route::get('/maintenance/requests/{id}/edit', function ($id) {
+        return Inertia::render('Maintenance/Requests/Edit', [
+            'requestId' => $id,
+        ]);
+    })->name('maintenance.requests.edit');
+
+    Route::get('/maintenance/invoices/{id}', function ($id) {
+        return Inertia::render('Maintenance/Invoices/Show', [
+            'invoiceId' => $id
+        ]);
+    })->name('maintenance.invoices.show');
+
+    Route::get('/maintenance/settings', function () {
+        return Inertia::render('Maintenance/Settings/Index');
+    })->name('maintenance.settings');
+
+    
+});
