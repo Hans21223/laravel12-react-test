@@ -178,6 +178,12 @@ Route::middleware('auth')->group(function () {
         ]);
     })->name('maintenance.invoices.show');
 
+    Route::get('/maintenance/invoices/{id}/pay', function ($id) {
+        return Inertia::render('Maintenance/Invoices/Pay', [
+            'invoiceId' => $id
+        ]);
+    })->name('maintenance.invoices.pay');
+
     Route::get('/maintenance/settings', function () {
         return Inertia::render('Maintenance/Settings/Index');
     })->name('maintenance.settings');

@@ -1,17 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import MaintenanceLayout from '@/Layouts/MaintenanceLayout';
 import useFixFlowSettings from '@/hooks/useFixFlowSettings';
 
 export default function Index() {
     const { language } = useFixFlowSettings();
-    const isAdmin = usePage().props.auth.user.role === 'admin';
 
     const [invoices, setInvoices] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [status, setStatus] = useState('');
-    const [updatingId, setUpdatingId] = useState(null);
 
     const text = {
         th: {
@@ -137,31 +135,6 @@ export default function Index() {
     useEffect(() => {
         loadInvoices();
     }, []);
-
-    const updatePaymentStatus = async (
-        invoiceId,
-        paymentStatus
-    ) => {
-        setUpdatingId(invoiceId);
-
-        try {
-            await axios.put(
-                `/api/maintenance/invoices/${invoiceId}`,
-                {
-                    payment_status: paymentStatus,
-                }
-            );
-
-            await loadInvoices();
-
-            alert(t.updateSuccess);
-        } catch (error) {
-            console.error(error);
-            alert(t.updateError);
-        } finally {
-            setUpdatingId(null);
-        }
-    };
 
     const filteredInvoices = useMemo(() => {
         const keyword = search
@@ -713,55 +686,6 @@ export default function Index() {
                                                             <i className="bi bi-eye"></i>
                                                             {t.view}
                                                         </Link>
-
-
-                                                        {isAdmin && (
-                                                        <select
-                                                            value={
-                                                                invoice.payment_status
-                                                            }
-                                                            disabled={
-                                                                updatingId ===
-                                                                invoice.id
-                                                            }
-                                                            onChange={(
-                                                                e
-                                                            ) =>
-                                                                updatePaymentStatus(
-                                                                    invoice.id,
-                                                                    e.target.value
-                                                                )
-                                                            }
-                                                            className="
-                                                                w-full
-                                                                rounded-lg
-                                                                border
-                                                                border-slate-200
-                                                                bg-white
-                                                                px-2 py-2
-                                                                text-xs
-                                                                font-semibold
-                                                                text-slate-700
-                                                                outline-none
-                                                                focus:border-blue-500
-                                                                disabled:cursor-not-allowed
-                                                                disabled:opacity-60
-                                                            "
-                                                        >
-                                                            <option value="unpaid">
-                                                                {t.unpaid}
-                                                            </option>
-
-                                                            <option value="paid">
-                                                                {t.paid}
-                                                            </option>
-
-                                                            <option value="cancelled">
-                                                                {t.cancelled}
-                                                            </option>
-                                                        </select>
-                                                        )}
-
                                                     </div>
 
                                                 </td>

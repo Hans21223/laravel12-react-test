@@ -106,11 +106,15 @@ Route::prefix('maintenance')
             'repair-logs' => 'repairLog'
         ])->middleware('check.role:technician,admin');
 
-        // ใบแจ้งหนี้: ช่างและ Admin ดูและสร้างได้ เปลี่ยนสถานะชำระเงินหรือลบได้เฉพาะ Admin
+        // ใบแจ้งหนี้: ช่างและ Admin ดูรายการและสร้างได้ ยกเลิกหรือลบได้เฉพาะ Admin
         Route::apiResource(
             'invoices',
             InvoiceController::class
-        )->only(['index', 'show', 'store'])->middleware('check.role:technician,admin');
+        )->only(['index', 'store'])->middleware('check.role:technician,admin');
+
+        // ผู้แจ้งเปิดดูและชำระใบแจ้งหนี้ของตัวเองได้ (ตรวจสิทธิ์ใน Controller)
+        Route::get('invoices/{invoice}', [InvoiceController::class, 'show']);
+        Route::post('invoices/{invoice}/pay', [InvoiceController::class, 'pay']);
 
         Route::apiResource(
             'invoices',

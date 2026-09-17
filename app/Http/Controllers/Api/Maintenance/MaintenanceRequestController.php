@@ -123,6 +123,13 @@ class MaintenanceRequestController extends Controller
 
         $maintenanceRequest->update($validated);
 
+        // ยกเลิกงานแล้ว ใบแจ้งหนี้ที่ยังไม่ชำระก็ไม่ต้องเก็บเงิน
+        if (($validated['status'] ?? null) === 'cancelled') {
+            $maintenanceRequest->invoice()
+                ->where('payment_status', 'unpaid')
+                ->update(['payment_status' => 'cancelled']);
+        }
+
         if (
             isset($validated['status']) &&
             $validated['status'] === 'in_progress' &&

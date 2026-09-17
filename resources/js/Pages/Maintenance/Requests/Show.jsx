@@ -56,6 +56,7 @@ export default function Show({ requestId }) {
             technician: "ช่างที่รับผิดชอบ",
             notAssigned: "ยังไม่ได้มอบหมาย",
             noInvoice: "ยังไม่มีใบแจ้งหนี้",
+            payNow: "ชำระเงิน",
             problemDetails: "รายละเอียดปัญหา",
             noDescription: "ไม่มีรายละเอียดเพิ่มเติม",
 
@@ -155,6 +156,7 @@ export default function Show({ requestId }) {
             technician: "Assigned Technician",
             notAssigned: "Not assigned",
             noInvoice: "No invoice yet",
+            payNow: "Pay now",
             problemDetails: "Issue Description",
             noDescription: "No additional description",
 
@@ -1125,13 +1127,41 @@ export default function Show({ requestId }) {
                                         </div>
                                     </div>
 
-                                    <div className="mt-3 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
-                                        <i className="bi bi-check-circle mr-2"></i>
+                                    <div
+                                        className={`mt-3 rounded-xl px-4 py-3 text-sm font-semibold ${
+                                            {
+                                                paid: "bg-emerald-50 text-emerald-700",
+                                                unpaid: "bg-amber-50 text-amber-700",
+                                                cancelled: "bg-rose-50 text-rose-700",
+                                            }[item.invoice.payment_status] ??
+                                            "bg-slate-100 text-slate-600"
+                                        }`}
+                                    >
+                                        <i
+                                            className={`bi ${
+                                                item.invoice.payment_status === "paid"
+                                                    ? "bi-check-circle"
+                                                    : item.invoice.payment_status === "cancelled"
+                                                      ? "bi-x-circle"
+                                                      : "bi-hourglass-split"
+                                            } mr-2`}
+                                        ></i>
 
                                         {paymentText[
                                             item.invoice.payment_status
                                         ] ?? item.invoice.payment_status}
                                     </div>
+
+                                    {item.invoice.payment_status === "unpaid" &&
+                                        (isAdmin || item.user_id === user.id) && (
+                                            <Link
+                                                href={`/maintenance/invoices/${item.invoice.id}/pay`}
+                                                className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white no-underline transition hover:bg-emerald-700"
+                                            >
+                                                <i className="bi bi-wallet2"></i>
+                                                {t.payNow}
+                                            </Link>
+                                        )}
 
                                     {isStaff && (
                                     <Link
