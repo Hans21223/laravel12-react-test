@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Maintenance;
 use App\Http\Controllers\Controller;
 use App\Models\MaintenanceRequest;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class MaintenanceRequestController extends Controller
 {
@@ -91,6 +92,26 @@ class MaintenanceRequestController extends Controller
         Request $request,
         MaintenanceRequest $maintenanceRequest
     ) {
+        $user = $request->user();
+
+        // ผู้แจ้งแก้ไขรายละเอียดได้ระหว่างรอดำเนินการ ส่วน Admin แก้ไขได้ทุกเมื่อ
+        if ($request->hasAny(['title', 'equipment_type', 'location', 'description', 'priority'])) {
+            abort_unless(
+                $user->role === 'admin' || ($maintenanceRequest->user_id === $user->id && $maintenanceRequest->status === 'pending'),
+                403,
+                'ไม่มีสิทธิ์แก้ไขรายการแจ้งซ่อมนี้'
+            );
+        }
+
+        // เปลี่ยนสถานะได้เฉพาะช่างที่รับงานนี้หรือ Admin
+        if ($request->has('status')) {
+            abort_unless(
+                $user->role === 'admin' || $maintenanceRequest->technician_id === $user->id,
+                403,
+                'ไม่มีสิทธิ์เปลี่ยนสถานะงานนี้'
+            );
+        }
+
         $validated = $request->validate([
             'title' => 'sometimes|required|string|max:255',
             'equipment_type' => 'sometimes|required|string|max:100',
@@ -127,8 +148,15 @@ class MaintenanceRequestController extends Controller
         ]);
     }
 
-    public function destroy(MaintenanceRequest $maintenanceRequest)
+    public function destroy(Request $request, MaintenanceRequest $maintenanceRequest)
     {
+        // ผู้แจ้งลบได้ระหว่างรอดำเนินการ ส่วน Admin ลบได้ทุกเมื่อ
+        abort_unless(
+            $request->user()->role === 'admin' || ($maintenanceRequest->user_id === $request->user()->id && $maintenanceRequest->status === 'pending'),
+            403,
+            'ไม่มีสิทธิ์ลบรายการแจ้งซ่อมนี้'
+        );
+
         $maintenanceRequest->delete();
 
         return response()->json([
@@ -141,7 +169,8 @@ class MaintenanceRequestController extends Controller
     MaintenanceRequest $maintenanceRequest
 ) {
     $validated = $request->validate([
-        'technician_id' => 'required|exists:users,id',
+        // มอบหมายได้เฉพาะผู้ใช้ที่เป็นช่าง
+        'technician_id' => ['required', Rule::exists('users', 'id')->where('role', 'technician')],
     ]);
 
     $maintenanceRequest->update([

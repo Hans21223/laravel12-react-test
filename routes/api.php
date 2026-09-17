@@ -54,10 +54,11 @@ Route::prefix('maintenance')
     ->middleware('auth:sanctum')
     ->group(function () {
 
+        // มอบหมายช่างได้เฉพาะ Admin
         Route::put(
             'requests/{maintenanceRequest}/assign',
             [MaintenanceRequestController::class, 'assignTechnician']
-        );
+        )->middleware('check.role:admin');
 
         Route::apiResource(
             'requests',
@@ -90,15 +91,29 @@ Route::prefix('maintenance')
             });
 
 
+        // ประวัติการซ่อม: ทุกคนดูได้ แต่บันทึก แก้ไข หรือลบได้เฉพาะช่างและ Admin
         Route::apiResource(
             'repair-logs',
             RepairLogController::class
-        )->parameters([
+        )->only(['index', 'show'])->parameters([
             'repair-logs' => 'repairLog'
         ]);
 
         Route::apiResource(
+            'repair-logs',
+            RepairLogController::class
+        )->except(['index', 'show'])->parameters([
+            'repair-logs' => 'repairLog'
+        ])->middleware('check.role:technician,admin');
+
+        // ใบแจ้งหนี้: ช่างและ Admin ดูและสร้างได้ เปลี่ยนสถานะชำระเงินหรือลบได้เฉพาะ Admin
+        Route::apiResource(
             'invoices',
             InvoiceController::class
-        );
+        )->only(['index', 'show', 'store'])->middleware('check.role:technician,admin');
+
+        Route::apiResource(
+            'invoices',
+            InvoiceController::class
+        )->only(['update', 'destroy'])->middleware('check.role:admin');
     });

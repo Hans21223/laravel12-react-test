@@ -46,13 +46,9 @@ Route::get('/hello-teacher', function () {
     return Inertia::render('HelloTeacher');
 })->name('hello-teacher');
 
-Route::get('/teacher', function () {
-    return Inertia::render('HelloTeacher');
-})->middleware('auth');
-
-Route::middleware(['auth', 'role:admin,teacher,guest'])->group(function () {
+Route::middleware(['auth', 'check.role:admin,teacher,guest'])->group(function () {
     Route::get('/teacher', function () {
-        return Inertia::render('teacher');
+        return Inertia::render('HelloTeacher');
     });
 });
 

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import MaintenanceLayout from '@/Layouts/MaintenanceLayout';
 import useFixFlowSettings from '@/hooks/useFixFlowSettings';
 
 export default function Show({ invoiceId }) {
     const { language } = useFixFlowSettings();
+    const isAdmin = usePage().props.auth.user.role === 'admin';
 
     const [invoice, setInvoice] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -1066,7 +1067,8 @@ export default function Show({ invoiceId }) {
                         </section>
 
 
-                        {/* PAYMENT STATUS */}
+                        {/* PAYMENT STATUS: เปลี่ยนได้เฉพาะ Admin */}
+                        {isAdmin && (
                         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
 
                             <div className="flex items-center gap-3">
@@ -1137,6 +1139,7 @@ export default function Show({ invoiceId }) {
                             </button>
 
                         </section>
+                        )}
 
 
                         {/* PRINT */}

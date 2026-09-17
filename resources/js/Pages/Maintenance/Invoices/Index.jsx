@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import MaintenanceLayout from '@/Layouts/MaintenanceLayout';
 import useFixFlowSettings from '@/hooks/useFixFlowSettings';
 
 export default function Index() {
     const { language } = useFixFlowSettings();
+    const isAdmin = usePage().props.auth.user.role === 'admin';
 
     const [invoices, setInvoices] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -714,6 +715,7 @@ export default function Index() {
                                                         </Link>
 
 
+                                                        {isAdmin && (
                                                         <select
                                                             value={
                                                                 invoice.payment_status
@@ -758,6 +760,7 @@ export default function Index() {
                                                                 {t.cancelled}
                                                             </option>
                                                         </select>
+                                                        )}
 
                                                     </div>
 
